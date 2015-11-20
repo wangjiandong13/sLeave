@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mobile</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" /> 
+	<meta charset="utf-8">
+        
+    <meta http-equiv="CACHE-CONTROL" CONTENT="no-cache">
+    <meta http-equiv = "PRAGRAM" content ="no-cache">
+
+	
+    <link href="styles/kendo.mobile.all.min.css" rel="stylesheet" />
+    <link href="styles/css/custom-theme.css" rel="stylesheet" />
+    
+    <!--<script src="js/cordova.js"></script>-->
+    <script src="js/jquery-1.8.2.min.js"></script>
+    <script src="js/kendo.all.min.js"></script>
+    
+    <script>
+    	//Global App variable
+		var app;
+		/*
+		When loading page will initial the baisc event o the device
+		 */
+		function onLoad() {
+			//document.addEventListener("deviceready", onDeviceReady,false);
+			onDeviceReady();
+            $("#copyright").text('Copyright © ' +(new Date()).getFullYear()+ ' Keppel Land. All rights reserved.');
+		}
+
+		/*
+		 When loaded finish the function call and do a login check 
+		 */
+		function onDeviceReady() {
+			//Application Initial script
+            setTimeout(function(){navigator.splashscreen.hide();},3000);
+			app = new kendo.mobile.Application($(document).body, {
+				transition : "slide",
+				platform : "ios",
+				loading : "<h1>Loading...</h1>"
+			});
+
+			document.addEventListener("backbutton", function(e) {
+				if (app.view().id == "app.html" || app.view().id == "#loginPage") {
+					navigator.app.exitApp();
+				} else {
+					navigator.app.backHistory();
+				}
+			}, false);
+            
+            document.addEventListener("resume", function(e){
+                                      setTimeout(
+                                                 function() {
+                                                 logoutAccount();
+                                                 }, 0);}, false);
+            
+            document.addEventListener("active", logoutAccount, false);
+            
+			//autoLoginProcess();
+		}
+	</script>
+
+</head>
+
+<body onload="onLoad()">
+
+    <div data-role="view" id="loginPage" data-show="loginPageInitial">
+        
+        <div class="login-logo">
+            <img src="styles/images/LogoTrans.png" />
+        </div>
+        <div id="applogo" class="login-applogo">
+            <img src="styles/images/appLogo.png" />
+        </div>
+        <div class="login-version">Version 2.0</div>
+        <div class="login-input">
+            <input type="text" id="uid" placeholder="User Name"
+            style="color: black;"  onfocus="document.getElementById('applogo').style.display='none';"
+            onblur="document.getElementById('applogo').style.display='';"/>
+        </div>
+        <div class="login-input">
+            <input type="password" id="pwd" placeholder="Password"
+            style="color: black;" onfocus="document.getElementById('applogo').style.display='none';"
+            onblur="document.getElementById('applogo').style.display='';"/>
+        </div>
+        <div class="login-btn">
+            <a data-click="maulLoginProcess" data-role="button" id="loginButton">Sign
+                in</a>
+        </div>
+        <div class="login-loading" id="loginMsg"></div>
+        <div class="login-copyright"><div id="copyright">Copyright Keppel Land Limited. All rights reserved.</div></div>
+        
+    </div>
+
+
+<!-- This is the main menu layout contain the basic function model of the first level applicaiton 
+<div data-role="layout" data-id="functionLayout">
+	<footer data-role="footer">
+        <div data-role="tabstrip">  
+	        <a href="tab-home.html"><img src="styles/images/home.png"></a>
+	        <a href="tab-account.html"><img src="styles/images/account.png"></a>
+        </div>
+    </footer>
+</div> -->
+
+<script>
+	
+	//The server setting String [ServerIP:No.Port]
+
+	//var serverConfigStr = 'http://172.16.20.21/mobilesso';
+	var serverConfigStr = 'http://ssl.keppelland.com/mobilessov30';
+	/*
+		[0]-uid, [1]-Department, [2]-employeeID, [3]-employeeName
+	*/
+	var global_accountInfo = new Array();
+	
+	
+	function loginPageInitial(e){
+		setMsgTip('',false,true);
+		$("#uid").val('').show();
+		$("#pwd").val('').show();
+        $("div.login-logo").css("height", window.innerHeight * 0.25 + "px");
+        $("div.login-applogo").css("height",window.innerHeight * 0.3+ "px");
+        $("div.login-version").css("height", window.innerHeight * 0.05 + "px");
+        $("div.login-input").css("height", window.innerHeight * 0.08 + "px");
+        $("div.login-btn").css("height", window.innerHeight * 0.1 + "px");
+        $("div.login-loading").css("height",window.innerHeight * 0.06 + "px");
+        $("div.login-copyright").css("height", window.innerHeight * 0.08 + "px");
+		e.view.scroller.reset();
+	}
+	
+	/*
+	 * Work the main logic of the Login part
+	 */
+	function autoLoginProcess() {
+		if (checkConnection()) {
+			if (haveAccount()) {
+				$("#uid").val(getAccountInfo("uid")).hide();
+				$("#pwd").val(getAccountInfo("pwd")).hide();
+				authenticateAccount($("#uid").val(), $("#pwd").val());
+			}
+			else{
+				$("#uid").show();
+				$("#pwd").show();
+				setMsgTip('',false,true);
+			}
+		}
+		else {
+			setMsgTip('No internet connection!',true,true);
+		}
+	}
+	
+	/*
+	 * Submit the the form when user click the login button.
+	 * Will the check the uid and pwd
+	 */
+	function maulLoginProcess() {
+		if(checkConnection()){
+			if (validateForm()) {
+				authenticateAccount($("#uid").val(), $("#pwd").val());
+			}
+		}
+		else {
+			setMsgTip('No internet connection!',true,true);
+		}
+	}
+	
+	/*
+		Log out function will clear the local data from the mobile
+	*/
+	function logoutAccount() {
+		clearAccount();
+		app.navigate("#loginPage");
+	}
+	
+	function authenticateAccount(pauid, papwd) {
+        var timetoken = (new Date()).valueOf();
+		setMsgTip('Authenticating...',false,false);
+		$.ajax({
+					url : serverConfigStr+'/api/Authentication/CheckLogin',
+					dataType : 'json',
+					data : {
+						uid : pauid,
+						pwd : papwd,
+                        timetoken:timetoken
+					},
+					success : function(result,textStatus,jqXHR) {
+						//alert(jqXHR.getResponseHeader("Set-Cookie"));
+						if(result == null || result == ""){
+							setMsgTip('Incorrect User Name or Password!',true,true);
+						}
+						else{
+							global_accountInfo = result.split('|');
+                            //console.log('1'+global_accountInfo[2]);
+                            window.localStorage.setItem("account_emploeemaster", global_accountInfo[2]);
+							saveAccount(global_accountInfo[0], papwd);
+							app.navigate('app.html');
+						}	
+					},
+					beforeSend: function() {
+			            app.showLoading();         
+			        },
+			        complete:function(){
+						app.hideLoading();
+					},
+					error : function(jqXHR, textStatus, errorThrown) {
+						$("#uid").show();
+						$("#pwd").show();
+						console.log('HTTP Status:'+jqXHR.status);
+						setMsgTip('Server is unavailable, please try again!',true,true);
+					},
+					timeout : 30000
+				});
+
+	}
+	
+	/*
+		Check the mobile connection type and set the information and whther can user the network
+	*/
+	function checkConnection() {
+		setMsgTip('Check connection...',false,false);
+		//var connection = navigator.connection.type;
+		//if (connection == Connection.NONE)
+		//	return false;
+		return true;
+	}
+
+	/*
+		Simply check the input context is not empty and null
+	*/
+	function validateForm() {
+		if ($("#uid").val() == null || $("#uid").val() == "") {
+			setMsgTip('User Name is required!',true,true);
+			return false;
+		}
+		if ($("#pwd").val() == null || $("#pwd").val() == "") {
+			setMsgTip('Password is required!',true,true);
+			return false;
+		}
+		return true;
+	}
+	
+	/*
+		Commone script to manage the account information in the cache
+	*/
+	function haveAccount() {
+		var value = getAccountInfo("uid");
+		if (value == null || value == "")
+			return false;
+		else
+			return true;
+	}
+	function saveAccount(uid, pwd) {
+		window.localStorage.setItem("account_uid", uid);
+		window.localStorage.setItem("account_pwd", pwd);
+	}
+	//Get the account info by key
+	function getAccountInfo(key){
+		return window.localStorage.getItem("account_"+key);
+	}
+	//Clear the account record to reset the data
+	function clearAccount() {
+		window.localStorage.clear();
+	}
+	
+	//Authrize Error
+	function AJAXErrorHandler(jqXHR, textStatus, errorThrown) {
+		if(jqXHR.status == 401 || jqXHR.status == 302){
+			app.navigate("#loginPage");
+		}
+		app.hideLoading();
+		console.log(jqXHR.status);
+	}
+	
+	//Tool to set the message to show to the user
+	function setMsgTip(msg, isWarning, canLogin){
+		if(isWarning) $("#loginMsg").text(msg).css('color','red');
+		else $("#loginMsg").text(msg).css('color','black');
+		//Set the login btn
+		if(canLogin){
+			$("#loginButton").show();
+			$("#uid").show();
+			$("#pwd").show();
+		}
+		else{
+			$("#loginButton").hide();
+			$("#uid").hide();
+			$("#pwd").hide();
+		}
+	}
+	
+</script>
+
+</body>
+</html>

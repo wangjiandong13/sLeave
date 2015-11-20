@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Application eLeave</title>
+</head>
+<body>
+	<div data-role="view" id="eLeaveList" data-init="eLeaveInitialDataBind" data-show="eLeaveDataBind">
+		<header data-role="header">
+			<div data-role="navbar">
+				<a id="back-to-menu" data-align="right"
+					data-role="button" data-click="logoutAccount" data-icon="home">Log out</a>
+			 	<span data-role="view-title">sLeave</span> 
+			</div>
+		</header>
+		<footer data-role="footer">
+			<div data-role="navbar" id = "MultiSelectionAction" >
+				<a id="select-all-button" data-align="left" data-role="button" data-icon="mostviewed"
+					data-click="selectAll">Select All</a>
+				<a id="cancel-button" data-align="left" data-role="button" data-icon="organize"
+					data-click="cancelSelectAll">Clear All</a>
+				<span data-role="view-title" style="color:rgb(229, 229, 229)">&nbsp;</span>
+                <a data-role="button" data-click="multipleLeavesApproval"
+					data-status="A" data-align="right" data-icon="add">Approve</a>
+                <span data-align="right" style="color:rgb(229, 229, 229)" width ="20%">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+				<a data-align="right" data-role="button" data-rel="modalview" data-icon="mostrecent"
+                    href="#modalview-list-reject">Reject</a>
+			</div>
+		</footer>
+		<div id="headtext"  style="text-align: center;"><h3>No Pending Leave Application To Approve!</h3></div>
+		<ul id="leave-List-view"></ul>
+		
+		<div data-role="modalview" data-open="checkItems" id="modalview-list-reject" align="center" style="width: 90%; height: 160px;">
+		<form>
+			<div data-role="header">
+        		<div data-role="navbar">
+            	<span style="color:black">Reason of Rejection</span>
+        	</div>
+        	</div>
+        	<div style="position: absolute;top:55px;left:5%;width:90%">
+        	<label style="valign:botton;halign:center">
+                    <textarea id="list-reject-reason" 
+                    	style="resize:both;color:black;width:90%" placeholder="Please Input The Reason Here."></textarea>
+            </label>
+            <div style="width:80%;position: absolute;top: 65px">
+			   <a data-click="multipleLeavesApproval" id="list-reason-reject-button" data-status="R"
+			   	   data-role="button" style="position:absolute;left:5%;width:40%">Submit</a>
+        	   <a data-click="closeModalViewListReject" id="list-cancel-reject-button" 
+        	   	   data-role="button" style="position:absolute;left:70%;width:40%">Cancel</a>
+            </div>
+            </div>
+        </form>
+        </div>        
+	</div>
+	
+	
+	
+
+	
+<!-- 	eLeave List Template -->
+
+	<script type="text/x-kendo-template" id="leave-List-View-Template">
+	<div class="leave-list-view-template-div">
+		<div class="eleave-checkbox-div">
+			<img id="eleave-checkbox" class="eleave-checkboxs" src="styles/images/unchecked.png" autoNumber=${AutoNumber}
+				checked= false applicationStatus=${ApplicationStatus}/>
+		</div>
+		<div class="eleave-list-div">
+			<div style="font-weight:bold;font-size:22;">
+				${NameLegal}
+			</div>
+            <div style="color:rgb(176,176,176);font-size:10pt">Date:
+            <div style="color:rgb(176,176,176);float:right;");><span style="color:rgb(74,74,74);">${FromDate}</span>
+            &nbsp;to&nbsp;
+            <span style="color:rgb(74,74,74);">${ToDate}</span></div></div>
+            <div style="color:rgb(176,176,176);font-size:10pt">No. of days:
+            <span style="color:rgb(74,74,74);float:right;">${NoOfDays}</span></div>
+            <div style="color:rgb(176,176,176);font-size:10pt">Leave type:
+            <span style="color:rgb(74,74,74);float:right;">${Code}</span></div>
+            <div style="color:rgb(176,176,176);font-size:10pt">Remarks:
+            <span style="color:rgb(74,74,74);float:right;">${Remarks}${Reason}</span></div>
+            
+		</div>
+    </div>
+	</script>
+
+
+
+
+	<script type="text/javascript" charset="utf-8"> 
+  	 	var autoNumberToJson;
+  	 	var autoNumber;
+        var datanull = false;
+  	 	var applicationStatus;
+ 	 	var detailsStatusToJson;
+ 	 	var selectedItemsToJason; 	 	
+		//var uid = global_accountInfo[0];
+        var uid='jiandong.wang';
+//---------------------------------------------	
+//      This EmployeeMaster And UID Is For Testing
+//---------------------------------------------
+        //var EmployeeMaster = 'S7082062E';
+ 	 	//S7082062E
+ 	 	//S6884729Z
+        //var n=0;
+        
+	 	//var EmployeeMasterToJson = {'EmployeeMaster':EmployeeMaster};
+	 	//var multipleSelectionFlag=false;
+
+//---------------------------------------------		 	
+// 	 	eLeave list Initial Page
+//---------------------------------------------	
+	    function eLeaveInitialDataBind(e) {
+            var EmployeeMaster = window.localStorage.getItem("account_emploeemaster");
+            
+            //EmployeeMaster = 'S7082062E';
+            
+            var timetoken = (new Date()).valueOf();
+	        $.ajax({
+            url: ''+serverConfigStr+'/api/LeaveApproval/GetAll',
+            type: "GET",
+            data: {EmployeeMaster:EmployeeMaster, timetoken :timetoken},
+            //data: EmployeeMasterToJson,
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            success: function (leavedata) {
+                   console.log('2'+EmployeeMaster);
+                   if(leavedata.length==0){
+					leavedata=[{"Department":" ","AutoNumber":" ","NameLegal":" ","FromDate":" ","ToDate":" ","NoOfDays":" ","Code":" ","ApplicationStatus":" ","Remarks":" ","Reason":" "}];
+                   }
+	    	    $("#leave-List-view").kendoMobileListView({
+	 	        	dataSource: kendo.data.DataSource.create({data:leavedata}),
+	 	            template: $("#leave-List-View-Template").html(),
+	 	           	click: function(e) {
+ 	            		autoNumber=e.dataItem.AutoNumber;
+	 	          		var checkbox = e.item.find("#eleave-checkbox");
+                        if(checkbox.attr('checked')){
+	 	          				checkbox.attr('src','styles/images/checked.png');
+	 	           				checkbox.attr('checked',false);
+                            }
+                        else{
+                            checkbox.attr('src','styles/images/unchecked.png');
+                            checkbox.attr('checked',true);
+                            }	
+	 		    		},
+                     pullToRefresh:true,
+                     pullParameters:function(item)
+                     {
+                        eLeaveDataBind();
+                        return item;
+                     }
+	    	        });
+                   if(leavedata[0].AutoNumber==" "){
+            	 		$("#headtext").show();
+             	 		$("#leave-List-view").hide();
+                        datanull = true;
+            	 		}
+            	 	else{
+            	 		$("#headtext").hide();
+            	 		$("#leave-List-view").show();
+                        datanull=false;
+            	 	}
+                   $("#select-all-button").show();
+                   $("#cancel-button").hide();
+			},
+             error: AJAXErrorHandlerELeave
+        	});
+	    }
+	    
+//---------------------------------------------		    
+// 	    eLeave List Show Page
+//---------------------------------------------	
+	    function eLeaveDataBind(e) {
+                var EmployeeMaster = window.localStorage.getItem("account_emploeemaster");
+            
+                //if(n==0){EmployeeMaster = 'S7082062E';n++;}
+                //else {EmployeeMaster = 'S6884729Z';n=0;}
+            
+                var timetoken = (new Date()).valueOf();
+	    	    $.ajax({
+        	    url: ''+serverConfigStr+'/api/LeaveApproval/GetAll',
+        	    type: "GET",
+                data: {EmployeeMaster:EmployeeMaster, timetoken :timetoken},
+    	        //data: EmployeeMasterToJson,
+    	        dataType: 'json',
+	            contentType: "application/json; charset=utf-8",
+                       success: function (leavedata) {
+                       //console.log('3'+EmployeeMaster);
+                       //console.log(leavedata);
+             	 	if(leavedata.length == 0)
+                        leavedata=[{"Department":" ","AutoNumber":" ","NameLegal":" ","FromDate":" ","ToDate":" ","NoOfDays":" ","Code":" ","ApplicationStatus":" ","Remarks":" ","Reason":" "}];
+         	        $("#leave-List-view").data("kendoMobileListView").setDataSource(kendo.data.DataSource.create({data:leavedata}));
+                    if(leavedata[0].AutoNumber==" ")
+                    {
+            	 		$("#headtext").show();
+             	 		$("#leave-List-view").hide();
+                        datanull = true;
+                    }
+            	 	else{
+                        datanull=false;
+            	 		$("#headtext").hide();
+            	 		$("#leave-List-view").show();
+                    }
+                    $("#select-all-button").show();
+                    $("#cancel-button").hide();
+				},
+   	          	error: AJAXErrorHandlerELeave
+        		});
+	    }
+	    
+	    
+//---------------------------------------------		    
+// 	    'Select Item' , 'Select ALL' And 'Cancel ALL Actions' In The Multiple Selection
+//---------------------------------------------		    
+	    function selectAll(e)
+	    {
+            if(!datanull)
+            {
+                var checkbox = $(".eleave-checkboxs");
+                checkbox.attr('src','styles/images/checked.png');
+                checkbox.attr('checked',false);
+                $("#select-all-button").hide();
+                $("#cancel-button").show();
+            }
+	    }
+	    
+	    function cancelSelectAll(e)
+	    {
+            if(!datanull)
+            {
+                var checkbox = $(".eleave-checkboxs");
+                checkbox.attr('src','styles/images/unchecked.png');
+                checkbox.attr('checked',true);
+                $("#select-all-button").show();
+                $("#cancel-button").hide();
+            }
+	    }
+	    	    
+	            
+//---------------------------------------------			
+// 		Multiple Approval in List Page
+//---------------------------------------------	
+		function multipleLeavesApproval(e)
+		{
+			var data=e.button.data();
+			var status=data.status;
+            var applicationStatusList='';
+            var autoNumberList='';
+            //console.log(status);
+			$(".eleave-checkboxs").each(function(i){
+				if(!$(this).attr('checked'))
+					{
+                        autoNumberList+=($(this).attr('AutoNumber')+',');
+					}
+                applicationStatusList+=(status+',');
+			});
+            if(datanull)
+                navigator.notification.alert('No Selection.Please Select The Item First!',function diss(){},'','OK');
+            else
+            {
+                if(autoNumberList=='')navigator.notification.alert('No Selection.Please Select The Item First!',function diss(){},'','OK');
+                else
+                {
+                    var reason;
+                    if(status!='R') reason = null;
+                    else {
+                            reason = $("#list-reject-reason").val();
+                    }
+                    closeModalViewListReject();
+                    selectedItemsToJason = {'AutoNumberList':autoNumberList,'UID':uid,'ApplicationStatusList':applicationStatusList,'Reason':reason};
+                    //console.log(applicationStatusList);
+                    $.ajax({
+                           url: ''+serverConfigStr+'/api/LeaveApproval/MultipleLeavesApproval',
+                           type: "GET",
+                           data: selectedItemsToJason,
+                           dataType: 'json',
+                           contentType: "application/json; charset=utf-8",
+                           success: function (resultdata) {
+                           if(resultdata) {navigator.notification.alert('Press OK to cotinue',eLeaveDataBind,'Update Successfully','OK');}
+                           else  {navigator.notification.alert('Press OK to cotinue',eLeaveDataBind,'Update failed','OK');}					},
+                           error: AJAXErrorHandlerELeave
+                       });
+                }
+            }
+		}
+		
+		
+//---------------------------------------------			
+//		List Page Back To Menu Page
+//---------------------------------------------		    
+	    function backToMenu(e)
+	    {
+	    	multipleSelectionFlag=false;
+	    	app.navigate("tab-home.html");
+	    }
+	    
+//---------------------------------------------		    
+//	    Authrize Handle
+//---------------------------------------------		    
+		function AJAXErrorHandlerELeave(jqXHR, textStatus, errorThrown)
+		{
+            //console.log(jqXHR.status);
+ 			if(jqXHR.status == 401 || jqXHR.status == 404||jqXHR.status == 302){
+ 				app.navigate("index.html");
+ 			}
+ 		}
+ 		
+
+//---------------------------------------------		
+//      Manage the Rejection Reason ModalView
+//---------------------------------------------
+        function checkItems(e)
+        {
+            if(datanull)
+                navigator.notification.alert('No Selection.Please Select The Item First!',closeModalViewListReject,'','OK');
+            else
+            {
+                var t = 0;
+                $(".eleave-checkboxs").each(function(i){
+                                        if(!$(this).attr('checked'))t++;});
+                if(t==0)navigator.notification.alert('No Selection.Please Select The Item First!',closeModalViewListReject,'','OK');
+            }
+        }
+		function closeModalViewDetailsReject(e) {
+	        $("#modalview-details-reject").kendoMobileModalView("close");
+	    }
+		function closeModalViewListReject(e) {
+	        $("#modalview-list-reject").kendoMobileModalView("close");
+	    }
+		
+	</script>
+</body>
+</html>

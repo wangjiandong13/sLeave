@@ -1,0 +1,99 @@
+.km-ios .km-view .km-content .km-button.km-state-active {
+    background-color: rgb(255, 148, 0);
+}
+.km-ios .km-view .km-content .km-list .km-state-active .km-listview-link {
+    background-color: rgb(255, 148, 0);
+}
+.km-ios .km-view .km-navbar {
+    font-family: HelveticaNeue, Roboto, 'Myriad Pro', 'Nokia Pure', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    font-style: normal;
+    line-height: normal;
+    text-shadow: rgb(0, 0, 0) 0px -1px 0px;
+    background-color: rgb(255, 151, 15);
+}
+.km-ios .km-view .km-navbar .km-button.km-state-active {
+    background-color: rgb(127, 127, 127);
+}
+.km-ios .km-view .km-tabstrip .km-button.km-state-active {
+    background-image: -webkit-gradient(linear,50% 0,50% 100%,color-stop(0, rgba(255,255,255,.2)),color-stop(.5, rgba(255,255,255,.4)),color-stop(.5, rgba(255,255,255,.5)),color-stop(1, rgba(255,255,255,.8))),-webkit-gradient(linear,0 50%,100% 50%,color-stop(0, rgba(0,0,0,.6)),color-stop(.03, rgba(0,0,0,0)),color-stop(.97, rgba(0,0,0,0)),color-stop(1, rgba(0,0,0,.6)));
+    background-image: -moz-linear-gradient(50% 0,50% 100%,rgba(255,255,255,.2),rgba(255,255,255,.4) 50%,rgba(255,255,255,.5) 50%,rgba(255,255,255,.8)),-moz-linear-gradient(0 50%,100% 50%,rgba(0,0,0,.6),rgba(0,0,0,0) 3%,rgba(0,0,0,0) 97%,rgba(0,0,0,.6));
+    background-image: -ms-linear-gradient(50% 0,50% 100%,rgba(255,255,255,.2),rgba(255,255,255,.4) 50%,rgba(255,255,255,.5) 50%,rgba(255,255,255,.8)),-ms-linear-gradient(0 50%,100% 50%,rgba(0,0,0,.6),rgba(0,0,0,0) 3%,rgba(0,0,0,0) 97%,rgba(0,0,0,.6));
+    background-repeat-x: repeat, repeat;
+    background-repeat-y: repeat, repeat;
+    background-position-x: 0px, 0px;
+    background-position-y: 0px, 0px;
+    background-color: rgb(247,107,14);
+}
+.km-ios .km-view .km-tabstrip .km-button {
+    background-image: -webkit-gradient(linear,50% 0,50% 100%,color-stop(0, rgba(255,255,255,.6)),color-stop(.5, rgba(255,255,255,.35)),color-stop(.5, rgba(255,255,255,.4)),color-stop(1, rgba(255,255,255,.6))),-webkit-gradient(linear,0 50%,100% 50%,color-stop(0, rgba(255,151,15,.6)),color-stop(.03, rgba(255,151,15,0)),color-stop(.97, rgba(255,151,15,0)),color-stop(1, rgba(255,151,15,.6)));
+    background-image: -moz-linear-gradient(50% 0,50% 100%,rgba(255,255,255,.6),rgba(255,255,255,.35) 50%,rgba(255,255,255,.4) 50%,rgba(255,255,255,.6)),-moz-linear-gradient(0 50%,100% 50%,rgba(255,151,15,.6),rgba(255,151,15,0) 3%,rgba(255,151,15,0) 97%,rgba(255,151,15,.6));
+    background-image: -ms-linear-gradient(50% 0,50% 100%,rgba(255,255,255,.6),rgba(255,255,255,.35) 50%,rgba(255,255,255,.4) 50%,rgba(255,255,255,.6)),-ms-linear-gradient(0 50%,100% 50%,rgba(255,151,15,.6),rgba(255,151,15,0) 3%,rgba(255,151,15,0) 97%,rgba(255,151,15,.6));
+    background-repeat-x: repeat, repeat;
+    background-repeat-y: repeat, repeat;
+    background-position-x: 0px, 0px;
+    background-position-y: 0px, 0px;
+    background-color: rgb(255,151,15);
+}
+.km-ios .km-view .km-tabstrip .km-button .km-icon {
+    color: rgb(0, 0, 0);
+}
+.km-ios .km-view .km-navbar .km-button {
+    background-color: rgb(255, 151, 15);
+}
+.km-ios .km-view .km-navbar .km-button.km-state-active .km-text {
+    color: rgb(0, 0, 0);
+}
+.km-ios .km-view .km-navbar .km-button .km-text {
+    color: rgb(0, 0, 0);
+}
+.km-ios .km-view .km-navbar .km-view-title > * {
+    color: rgb(0, 0, 0);
+}
+.km-ios .km-view .km-content {
+    background-image: url('../images/BG-Login.png');
+    background-size: auto 100%;
+    background-repeat: repeat;
+}
+.km-ios .km-view .km-content .km-scrollview {
+    background-color: rgb(255, 255, 255);
+}
+.km-ios .km-view .km-content .km-list > li {
+    background-color: rgb(255, 255, 255);
+}
+.km-ios .km-view .km-content .km-button.km-state-active {
+    background-color: rgb(255, 148, 0);
+}
+.km-ios .km-view .km-content .km-button {
+    background-color: rgb(249, 157, 28);
+}
+
+div.login-logo{width:100%;text-align: center;}
+div.login-logo img{width: 80%;padding-top: 10%;margin-bottom: 10%;}
+div.login-applogo{width:100%;text-align: center;vertical-align:middle; margin: 0 auto;}
+div.login-applogo img{width:80%;margin: 0 auto;}
+div.login-version{width:90%; text-align: right; color: white; font-size: 12pt;}
+div.login-input{width:100%;text-align: center;}
+div.login-input input{width:80%;font-size: 18px;}
+div.login-btn{width:100%;text-align:center;}
+div.login-btn a{width:40%;font-size:14pt;}
+div.login-loading{width:100%;text-align:center;font-size: 12pt;}
+div.login-copyright{width: 100%; text-align: center; color: white; font-size: 0.8em;}
+div.login-copyright div {width:100%;  position: absolute; bottom: 0; margin: 0 auto;}
+
+
+#leave-List-view .list-item-checkbox img{width: 40px;height: 40px;}
+#leave-List-view a.list-item-checkbox
+{
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+	background-color: transparent;
+}
+.leave-list-view-template-div{width:100%;}
+.eleave-checkbox-div{width:10%;float:left;}
+.eleave-list-div{width:90%;float:left;}
+.eleave-checkboxs{width:22px;margin-top:35px;}
+textarea{font-size:13pt;};
+
